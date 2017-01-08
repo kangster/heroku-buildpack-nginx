@@ -7,9 +7,8 @@ main() {
     ENV_DIR=$3
     BUILDPACK_DIR=$(readlink -f $(dirname $(type -P "$0"))/..)
 
-    NGINX_VERSION=1.5.12
-    NGINX_PCRE_VERSION=8.34
-    NGINX_HEADERS_MORE_VERSION=0.25
+    NGINX_VERSION=1.11.8
+    NGINX_PCRE_VERSION=8.39
 
     set -eo pipefail
 
@@ -48,8 +47,7 @@ build-nginx() {
     declare nginx_build_dir=/tmp/nginx-build
 
     declare nginx_url=http://nginx.org/download/nginx-$NGINX_VERSION.tar.gz
-    declare pcre_url=http://downloads.sourceforge.net/project/pcre/pcre/$NGINX_PCRE_VERSION/pcre-$NGINX_PCRE_VERSION.tar.bz2
-    declare headers_more_url=https://github.com/agentzh/headers-more-nginx-module/archive/v$NGINX_HEADERS_MORE_VERSION.tar.gz
+    declare pcre_url=ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-$NGINX_PCRE_VERSION.tar.bz2
 
     (
         set-indent
@@ -60,22 +58,13 @@ build-nginx() {
         curl -#L $nginx_url | tar xz
         cd nginx-$NGINX_VERSION
         curl -#L $pcre_url | tar xj
-        curl -#L $headers_more_url | tar xz
-
-        patch -p1 < $BUILDPACK_DIR/nginx-1.5.12-heroku.patch
 
         CFLAGS="-O3 -pipe" ./configure \
             --prefix=$nginx_install_dir \
             --with-pcre=pcre-$NGINX_PCRE_VERSION \
-            --add-module=$PWD/headers-more-nginx-module-$NGINX_HEADERS_MORE_VERSION \
-            --with-http_addition_module \
-            --with-http_dav_module \
             --with-http_gzip_static_module \
             --with-http_realip_module \
-            --with-http_stub_status_module \
-            --with-http_ssl_module \
-            --with-http_sub_module \
-            --with-http_xslt_module
+            --with-http_geoip_module
         make -j4
 
         mkdir -p $nginx_install_dir
