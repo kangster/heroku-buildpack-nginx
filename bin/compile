@@ -61,6 +61,8 @@ build-nginx() {
 
         CFLAGS="-O3 -pipe" ./configure \
             --prefix=$nginx_install_dir \
+            --with-cc-opt="-Wp,-I${BUILD_DIR}/vendor/geoip/include" \
+            --with-ld-opt="-L${BUILD_DIR}/vendor/geoip/lib" \
             --with-pcre=pcre-$NGINX_PCRE_VERSION \
             --with-http_gzip_static_module \
             --with-http_realip_module \
