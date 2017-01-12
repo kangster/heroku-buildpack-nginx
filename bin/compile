@@ -62,6 +62,7 @@ build-nginx() {
         {
           CFLAGS="-O3 -pipe" ./configure \
               --prefix=$nginx_install_dir \
+              --error-log-path=/dev/stderr \
               --with-cc-opt="-Wp,-I${BUILD_DIR}/vendor/geoip/include" \
               --with-ld-opt="-L${BUILD_DIR}/vendor/geoip/lib" \
               --with-pcre=pcre-$NGINX_PCRE_VERSION \
